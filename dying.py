@@ -1,10 +1,15 @@
 # Death function
 
 import time
-import writing
-import controls
 
-def death(head, controller, GRID_MAX, segments):
+import writing
+import game_starter
+import game_engine
+
+gamemode = 0    # updated by main
+
+def death(head, controller, GRID_MAX, segments, wn):
+
     time.sleep(1)
     head.goto(0, 0)
     head.direction = "stop"
@@ -21,3 +26,7 @@ def death(head, controller, GRID_MAX, segments):
 
     # Clear the segments list
     segments.clear()
+
+    if gamemode == 2:   # force restart for multiplayer
+        game_engine.Playing = False
+        wn.ontimer(lambda: game_starter.end_game(), 2500)

@@ -1,10 +1,14 @@
 import turtle
+
 import controls
 import create
 import loop
 import writing
+import endgame
 
 STEP = 20
+
+Playing = False
 
 # Key mappings
 WASD_KEYS = {
@@ -21,10 +25,16 @@ ARROW_KEYS = {
     "Right": lambda c: c.go_right(),
 }
 
-
 SINGLE_KEYS = WASD_KEYS | ARROW_KEYS
 
-def start_game(mode, wn, GRID_MIN, GRID_MAX, DELAY):
+# Constants passed from main:
+GRID_MAX = 0
+GRID_MIN = 0
+START_DELAY = 0
+
+def start_game(mode, wn):
+    loop.all_moving = False         # Initialize to False for all new game starts
+
     writing.mode(mode)
 
     food = turtle.Turtle()
@@ -34,10 +44,8 @@ def start_game(mode, wn, GRID_MIN, GRID_MAX, DELAY):
 
     if mode == 1:  # Single Player
         head = turtle.Turtle()
-        create.make_asset(head, 0, "square", "black", 0, 0)
+        create.make_asset(head, 0, "square", "orange", 0, 0)
         head.direction = "stop"
-
-        wn.update()
 
         controller = controls.MovementController(head, SINGLE_KEYS)
         controller.player_id = 0  # Single-player
@@ -53,16 +61,21 @@ def start_game(mode, wn, GRID_MIN, GRID_MAX, DELAY):
         ]
 
         def game_tick():
-            loop.main_loop(wn, players, food, GRID_MIN, GRID_MAX)
-            wn.ontimer(game_tick, int(DELAY * 1000))
+            if not Playing:
+                endgame.destroy_game(wn, players, food)
+                return
+
+            loop.main_loop(wn, players, food)
+            wn.ontimer(game_tick, int(START_DELAY * 1000))
 
         game_tick()
 
     elif mode == 2:  # Two Player
         # Player 0
         head0 = turtle.Turtle()
-        create.make_asset(head0, 0, "square", "black", -40, 0)
+        create.make_asset(head0, 0, "square", "orange", -40, 0)
         head0.direction = "stop"
+        segments0 = []  # <- separate list
         controller0 = controls.MovementController(head0, WASD_KEYS)
         controller0.player_id = 0
         controller0.bind_keys(wn)
@@ -71,29 +84,32 @@ def start_game(mode, wn, GRID_MIN, GRID_MAX, DELAY):
         head1 = turtle.Turtle()
         create.make_asset(head1, 0, "square", "blue", 40, 0)
         head1.direction = "stop"
+        segments1 = []  # <- separate list
         controller1 = controls.MovementController(head1, ARROW_KEYS)
         controller1.player_id = 1
         controller1.bind_keys(wn)
-
-        wn.update()
 
         players = [
             {
                 "id": 0,
                 "head": head0,
-                "segments": segments,
+                "segments": segments0,   # <- assign individual list
                 "controller": controller0,
-            }, 
+            },
             {
-                "id": 1,
+               "id": 1,
                 "head": head1,
-                "segments": segments,
+                "segments": segments1,   # <- assign individual list
                 "controller": controller1,
             }
         ]
 
         def game_tick():
-            loop.main_loop(wn, players, food, GRID_MIN, GRID_MAX)
-            wn.ontimer(game_tick, int(DELAY * 1000))
+            if not Playing:
+                endgame.destroy_game(wn, players, food)
+                return
 
-        game_tick()  
+            loop.main_loop(wn, players, food)
+            wn.ontimer(game_tick, int(START_DELAY * 1000))
+
+        game_tick()
