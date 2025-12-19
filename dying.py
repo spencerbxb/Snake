@@ -1,8 +1,8 @@
 # Death function
 
 import time
-import score
-import movement
+import writing
+import controls
 
 def death(head, controller, GRID_MAX, segments):
     time.sleep(1)
@@ -11,7 +11,9 @@ def death(head, controller, GRID_MAX, segments):
 
     controller.reset()
 
-    score.update_score(True)
+    player = controller.player_id
+
+    writing.update_score(True, player, wn=None)            # End the game + declare other player winner if multiplayer
 
     # Hide the segments
     for segment in segments:

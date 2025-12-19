@@ -3,10 +3,10 @@
 import turtle
 
 # Sets up the background
-def setup_screen(wn, dims):
+def setup_screen(wn, DIMS):
     wn.title("Python Python")
     wn.bgcolor("gray20")
-    wn.setup(width=dims, height=dims)
+    wn.setup(width=DIMS + 160, height=DIMS + 160)
     wn.tracer(0)
 
 # Draws the playing field
