@@ -32,4 +32,5 @@ def end_game():
     global started
     started = False
     game_engine.Playing = False
+    writing.score0 = 0
     writing.write_menu()

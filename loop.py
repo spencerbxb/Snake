@@ -7,15 +7,14 @@ import time
 import create
 import dying
 import writing
+import settings_vals
 
-GRID_CELLS = 0      # To be set by main.py
+grid_cells = 0      # To be set by main.py
 
 Delay = 0.1         # Default delay; can be modified by writing.py
 
-GRID_MAX = 0
-GRID_MIN = 0        # Initialized by main.py
-
-all_moving = False
+grid_max = 0
+grid_min = 0        # Subject to change by settings_vals
 
 # Manage movement of players around the map
 def move_players(players):
@@ -34,11 +33,6 @@ def move_players(players):
     for player in players:
         player["controller"].apply()
 
-PLAYER_COLORS = {
-    0: "yellow",
-    1: "purple",
-}
-
 # Manage food within the play space
 def check_food(players, food):
     for player in players:
@@ -51,12 +45,15 @@ def check_food(players, food):
             writing.update_score(False, player["id"], wn=None)
 
             # move food
-            x = random.randint(-GRID_CELLS, GRID_CELLS) * 20
-            y = random.randint(-GRID_CELLS, GRID_CELLS) * 20
+            x = random.randint(-grid_cells, grid_cells) * 20
+            y = random.randint(-grid_cells, grid_cells) * 20
             food.goto(x, y)
 
             # choose tail color by player id
-            color = PLAYER_COLORS.get(player["id"], "grey")
+            if player["id"] == 0:
+                color = settings_vals.fetch_color("p1t")
+            else:
+                color = settings_vals.fetch_color("p2t")
 
             # create new tail segment
             seg = turtle.Turtle()
@@ -74,15 +71,15 @@ def check_collisions(players, wn):
 
        # border collision)
         if (
-            head.xcor() > GRID_MAX or head.xcor() < GRID_MIN or
-            head.ycor() > GRID_MAX or head.ycor() < GRID_MIN
+            head.xcor() > grid_max or head.xcor() < grid_min or
+            head.ycor() > grid_max or head.ycor() < grid_min
         ):
-            dying.death(head, controller, GRID_MAX, segments, wn)
+            dying.death(head, controller, grid_max, segments, wn)
 
         # self collision
         for seg in segments[1:]:
             if head.distance(seg) < 20:
-                dying.death(head, controller, GRID_MAX, segments, wn)
+                dying.death(head, controller, grid_max, segments, wn)
 
        # other players collision
         for other in players:
@@ -94,7 +91,10 @@ def check_collisions(players, wn):
                 if seg in newly_spawned:
                     continue
                 if head.distance(seg) < 20:
-                    dying.death(head, controller, GRID_MAX, segments, wn)
+                    dying.death(head, controller, grid_max, segments, wn)
+
+
+all_moving = False
 
 def main_loop(wn, players, food):
 
