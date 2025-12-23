@@ -115,6 +115,8 @@ def settings_vals_init():
     settings_vals.p2t = DEFAULT_P2T
     settings_vals.background = DEFAULT_BACKGROUND
 
+    settings_vals.total_tiles = (2 * GRID_CELLS + 1) ** 2
+
 writing_constants()
 game_engine_constants()
 loop_constants()

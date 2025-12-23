@@ -8,6 +8,7 @@ import create
 import dying
 import writing
 import settings_vals
+import game_starter
 
 grid_cells = 0      # To be set by main.py
 
@@ -35,6 +36,19 @@ def move_players(players):
 
 # Manage food within the play space
 def spawn_food(foods, players):
+    # Calculate available space
+    total_length = 0
+    for p in players:
+        if p["id"] == 0:
+            total_length += 1 + (writing.score0 // 10)
+        else:
+            total_length += 1 + (writing.score1 // 10)
+    total_cells = settings_vals.total_tiles
+    available_space = total_cells - total_length
+    
+    if len(foods) >= available_space:
+        return  # No space for more food
+    
     x = random.randint(-grid_cells, grid_cells) * 20
     y = random.randint(-grid_cells, grid_cells) * 20
     for _ in range(100):  # limit attempts to avoid infinite loop
@@ -59,7 +73,32 @@ def spawn_food(foods, players):
             return
         x = random.randint(-grid_cells, grid_cells) * 20
         y = random.randint(-grid_cells, grid_cells) * 20
-    # If no valid position found after 100 attempts, skip spawning (rare case)
+    
+    # Failsafe: Scan from top-left to bottom-right for first available tile
+    for x_grid in range(-grid_cells, grid_cells + 1):
+        for y_grid in range(grid_cells, -grid_cells - 1, -1):
+            x = x_grid * 20
+            y = y_grid * 20
+            valid = True
+            for p in players:
+                if p["head"].distance((x, y)) < 20:
+                    valid = False
+                    break
+                for seg in p["segments"]:
+                    if seg.distance((x, y)) < 20:
+                        valid = False
+                        break
+            if valid:
+                for f in foods:
+                    if f.distance((x, y)) < 20:
+                        valid = False
+                        break
+            if valid:
+                food = turtle.Turtle()
+                create.make_asset(food, 0, "circle", "red", x, y)
+                foods.append(food)
+                return
+    # If still no spot (shouldn't happen with available_space check), do nothing
 
 def check_food(players, foods):
     eaten_foods = set()
@@ -148,6 +187,14 @@ def main_loop(wn, players, foods):
     check_food(players, foods)
     move_players(players)
     check_collisions(players, wn)
+
+    if len(players) == 1 and len(players[0]["segments"]) + 1 >= settings_vals.total_tiles:
+        # If player length is MAXXED, win
+        writing.write_single_win()
+
+        time.sleep(Delay * 2)
+
+        wn.ontimer(lambda: game_starter.end_game(), 2500)
 
     wn.update()
     time.sleep(Delay)

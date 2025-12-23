@@ -39,8 +39,9 @@ def fetch_color(var_name):
 
 grid_max = 0
 grid_min = 0
-
 CELL_SIZE = 0
+
+total_tiles = 0  # Total number of tiles on the grid
 
 import setup
 import loop
@@ -48,6 +49,7 @@ import loop
 def update_bounds(wn):
     global grid_max
     global grid_min
+    global total_tiles
 
     grid_cells = Dimensions // 2
     grid_max = grid_cells * CELL_SIZE
@@ -56,6 +58,8 @@ def update_bounds(wn):
     loop.grid_max = grid_max
     loop.grid_min = grid_min
     loop.grid_cells = grid_cells
+
+    total_tiles = (2 * grid_cells + 1) ** 2  # Total tiles = (positions per axis)^2
 
     color = fetch_color("background")
 

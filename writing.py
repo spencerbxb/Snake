@@ -227,6 +227,17 @@ def write_bottom():
         font=("Courier", int(font_size * 1.25), "bold")
     )
 
+def write_single_win():
+    color = "white"
+    pen.clear()
+    pen.goto(0, 0)
+    pen.color(color)
+    pen.write(
+        "YOU WON!",
+        align="center",
+        font=("Courier", TEXT_SIZE, "normal")
+    )
+
 def write_settings():
     pen.clear()
     draw_snakes.snakes_init(pen.screen)
