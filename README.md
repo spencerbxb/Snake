@@ -1,5 +1,9 @@
 # PYTHON PYTHON Version history:
 
+Dec 23:
+- Fixed a bug where food won't spawn by adding a guarantee of food generation
+- Added a game end screen for singleplayer mode
+
 Dec 22:
 - Updated settings:
     - Change the amount of apples within the playing field at a given moment (1-10)

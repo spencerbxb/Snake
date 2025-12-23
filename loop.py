@@ -51,7 +51,7 @@ def spawn_food(foods, players):
     
     x = random.randint(-grid_cells, grid_cells) * 20
     y = random.randint(-grid_cells, grid_cells) * 20
-    for _ in range(100):  # limit attempts to avoid infinite loop
+    for _ in range(settings_vals.total_tiles // 2):  # limit attempts to avoid infinite loope loop
         valid = True
         for p in players:
             if p["head"].distance((x, y)) < 20:
